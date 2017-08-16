@@ -157,12 +157,15 @@ def calcular_bpref(esperado, obtido):
 
 	print('BPREF avg score:', soma_final/len(esperado))
 
+def calcular_grafico_rp_ab(esperado, obtido):
+	print('\nCalculando gráfico RP-A/B')
+
 def avaliar_resultados(esperado, obtido, path, relevancias):
 	calcular_f1(esperado, obtido)
 	calcular_grafico_11pontos(esperado,obtido,path)
 	calcular_map(esperado, obtido)
 	calcular_p5_p10(esperado, obtido)
-	# calcular_grafico_rp_ab(esperado, obtido)
+	calcular_grafico_rp_ab(esperado, obtido)
 	calcular_MRR(esperado, obtido)
 	calcular_NDCG(esperado, obtido, relevancias)
 	calcular_bpref(esperado, obtido)
