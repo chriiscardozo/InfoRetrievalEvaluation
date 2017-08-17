@@ -69,6 +69,7 @@ def calcular_grafico_11pontos(esperado,obtido,path):
 		for k in esperado: avg += qry_points[k][i]
 		final_points.append(avg/len(esperado)*100)
 	print('11-points:',str(final_points))
+	plt.clf()
 	plt.plot([x*10 for x in range(11)],final_points, 'b.-')
 	plt.xlabel('recall')
 	plt.ylabel('precision')
@@ -157,15 +158,43 @@ def calcular_bpref(esperado, obtido):
 
 	print('BPREF avg score:', soma_final/len(esperado))
 
-def calcular_grafico_rp_ab(esperado, obtido):
-	print('\nCalculando gráfico RP-A/B')
+def calcular_vetor_rp(esperado, obtido):
+	print('\nCalculando vetor RP-A')
+	rp = []
+	for qry_number in esperado:
+		rp.append(precision(esperado[qry_number], obtido[qry_number][:len(esperado[qry_number])]))
+
+	print('R-Precision avg:', sum(rp)/len(esperado))
+	return rp
 
 def avaliar_resultados(esperado, obtido, path, relevancias):
 	calcular_f1(esperado, obtido)
 	calcular_grafico_11pontos(esperado,obtido,path)
 	calcular_map(esperado, obtido)
 	calcular_p5_p10(esperado, obtido)
-	calcular_grafico_rp_ab(esperado, obtido)
 	calcular_MRR(esperado, obtido)
 	calcular_NDCG(esperado, obtido, relevancias)
 	calcular_bpref(esperado, obtido)
+
+	return calcular_vetor_rp(esperado, obtido)
+
+def construir_rp_ab(dic):
+	print('\nCalculando histograma RP-A/B')
+	keys = list(dic.keys())
+	wins_a = 0
+	wins_b = 0
+	empate = 0
+	rp_ab = []
+	for i, item in enumerate(dic[keys[0]]):
+		v = item - dic[keys[1]][i]
+		rp_ab.append(v)
+		if(v > 0.0001): wins_a += 1
+		elif(v < -0.0001): wins_b += 1
+		else: empate += 1
+
+	print("WINS_"+keys[0]+" =", wins_a, "/ WINS_"+keys[1]+" =", wins_b, "/ EMPATE =", empate)
+	plt.clf()
+	plt.xlabel('Query number')
+	plt.ylabel('R-Precision A/B')
+	plt.bar([x for x in range(len(dic[keys[0]]))], rp_ab)
+	plt.savefig(os.path.join('rp_ab.png'))
